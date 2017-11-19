@@ -7,4 +7,5 @@ Codigo necesario para desplegar un REST APi con SpringBoot, JAX RS, JPA e Hibern
 -En intellij creamos un nuevo projecto del tipo "Spring Initializr" y pulsamos el boton next
 -En group ponemos el nombre de los paquetes que queramos, en artifact igual. Lo importante de esta pantalla es elegir el tipo de proyecto, en este ejemplo se ha usado maven
 -En la siguiente pantalla dentro del apartado web seleccionamos "web" y dentro del apartado SQL marcamos "JPA" y "H2" y pulsamos next
--Nos aparecera una nueva pantalla donde tendremos que poner el nombre de nuestro proyecto y finalizar dando a finish
+-Nos aparecera una nueva pantalla donde tendremos que poner el nombre de nuestro proyecto y finalizar dando a finishç
+-Hola y adios
