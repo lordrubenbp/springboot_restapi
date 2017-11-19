@@ -1,11 +1,53 @@
-# springboot_restapi
 
 Codigo necesario para desplegar un REST APi con SpringBoot, JAX RS, JPA e Hibernate
 
-# INSTRUCCIONES
+INSTRUCCIONES
+
+CONFIGURACION DEL PROYECTO EN INTELLIJ
 
 -En intellij creamos un nuevo projecto del tipo "Spring Initializr" y pulsamos el boton next
 -En group ponemos el nombre de los paquetes que queramos, en artifact igual. Lo importante de esta pantalla es elegir el tipo de proyecto, en este ejemplo se ha usado maven
 -En la siguiente pantalla dentro del apartado web seleccionamos "web" y dentro del apartado SQL marcamos "JPA" y "H2" y pulsamos next
--Nos aparecera una nueva pantalla donde tendremos que poner el nombre de nuestro proyecto y finalizar dando a finishç
--Hola y adios
+-Nos aparecera una nueva pantalla donde tendremos que poner el nombre de nuestro proyecto y finalizar dando a finish
+
+CAMBIOS EN EL PROYECTO YA CREADO
+
+-Primero cambiaremos el nombre de la clase donde se lanza la aplicacion, esta clase esta en src/main/"nuestro_paquete"/. Le pondremos "Runner"
+-Añadiremos a las dependencias de maven, los drivers JDBC de Mysql y las dependencias para las anotaciones JERSEY. En el archivo "pom.xml", pondremos las siguientes dependencias:
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jersey</artifactId>
+</dependency>
+
+<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+</dependency>
+
+-Vamos a el Project Structure de  nuestro proyecto y en module añadimos JPA y en default provider ponemos Hibernate
+-Creamos una nueva persistance unit, abriendo el panel de Persistence, teniendo seleccionada la carpeta principal, creamos una nueva "Persistence unit"
+-Debemos crearla en la ruta  src/main/resources/META-INF. Es probable que la carpeta META-INF tengamos que crearla y crear dentro nuesto .xml
+-Con el panel de Database nos conectamos a nuestra base de datos MySQL y para hacer los objetos POJO, tenemos que sobre la "Persistence unit" que acabamos de crear, pulsar segundo boton y elegir la opcion "Generate Persistence Mapping" y dentro seleccionar "by database schema"
+-En el menu que nos saldra elegimos nuestra base de datos y las tablas que queremos crear, asi como la carpeta donde se crearan las clases resultantes
+-Una vez hecho esto es importante configurar el persitanceUnit.xml para que hibernate lo pille bien, poniendo las siguientes lineas:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="persistenceUnit">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>es.rubenbp.springbootrestexample.entity.Modelo</class>
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/modelos3d"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value="mi_nombre"/>
+            <property name="hibernate.connection.password" value="mi_password"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+
+-La del provider y las del username y password son las que deben de ponerse
+
+
