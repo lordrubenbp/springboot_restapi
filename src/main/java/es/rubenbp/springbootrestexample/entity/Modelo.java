@@ -4,22 +4,13 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
+import java.util.Arrays;
 
 @Entity
-// TODO volver a intentar poniendo la clase como extend de serializable
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "modelo")
-public class Modelo implements Serializable {
-
-    @XmlAttribute(name = "id")
+public class Modelo {
     private int id;
-    @XmlAttribute(name = "nombre_objeto")
     private String nombre;
+    private byte[] data;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -41,6 +32,16 @@ public class Modelo implements Serializable {
         this.nombre = nombre;
     }
 
+    @Basic
+    @Column(name = "data", nullable = true)
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,6 +51,7 @@ public class Modelo implements Serializable {
 
         if (id != modelo.id) return false;
         if (nombre != null ? !nombre.equals(modelo.nombre) : modelo.nombre != null) return false;
+        if (!Arrays.equals(data, modelo.data)) return false;
 
         return true;
     }
@@ -58,6 +60,7 @@ public class Modelo implements Serializable {
     public int hashCode() {
         int result = id;
         result = 31 * result + (nombre != null ? nombre.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(data);
         return result;
     }
 }

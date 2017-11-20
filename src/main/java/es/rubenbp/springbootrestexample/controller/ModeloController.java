@@ -16,8 +16,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.*;
 import java.util.List;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 @Component
@@ -25,15 +27,17 @@ import java.util.List;
 public class ModeloController {
 
      private EntityManager entityManager;
+     private ModeloDAO modeloDAO;
 
    //private ModeloRepository modeloRepository;
 
-    // TODO LO QUE HAY QUE REGISTRAR EN JERSEYCONFIG ES ESTA CLASE MONGOLO!!!
+
     @Autowired
     public ModeloController()
     {
 
         connectHibernate();
+        modeloDAO= new ModeloDAO();
     }
 
     @GET
@@ -61,14 +65,43 @@ public class ModeloController {
 
     }
 
+    @GET
+    @Path("/get_file")
+    @Produces("application/json")
+    public String getFile() {
+
+        File file= new File("src/Assets/LEGO_Man.zip");
+        if(file.exists())
+        {
+           return "existe";
+        }else
+        {
+            return "pues no";
+        }
+    }
+
     @POST
     @Path("/post_modelo")
     @Produces("application/json")
-    public void addModelo(@QueryParam("nombre") String nombre)
+    public void addModelo()
     {
-        entityManager.getTransaction().begin();
+
+        // TODO 1 Hacer una segunda tabla donde solo aparezacan las claves y el byte[] de datos para no sobrecargar la lista de objetos
+
         Modelo modelo= new Modelo();
-        modelo.setNombre(nombre);
+
+        File file= new File("src/Assets/LEGO_Man.zip");
+
+        File fileUnzip = new File("src/Assets/LEGO_Man.zip");
+        File fileFolderUnzip= new File("src/Assets");
+
+        modeloDAO.unZipIt(fileUnzip,fileFolderUnzip);
+
+        modelo.setData( modeloDAO.fileToByte(file));
+        modelo.setNombre(file.getName());
+        entityManager.getTransaction().begin();
+
+        //modelo.setNombre(nombre);
         entityManager.persist(modelo);
         entityManager.getTransaction().commit();
 
@@ -84,3 +117,5 @@ public class ModeloController {
     }
 
 }
+
+
