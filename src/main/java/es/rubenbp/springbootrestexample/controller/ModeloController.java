@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
@@ -36,23 +38,23 @@ public class ModeloController {
     public ModeloController()
     {
 
-        connectHibernate();
         modeloDAO= new ModeloDAO();
+        connectHibernate();
+
     }
 
     @GET
     @Path("/get_all_modelos")
     @Produces("application/json")
-    public List<Modelo> findAllModelos()
+    public List<Modelo> getAllModelos()
     {
 
-        connectHibernate();
         entityManager.getTransaction().begin();
         List<Modelo> listaModelo = null;
         //return modeloRepository.findAll();
 
         try {
-            listaModelo = entityManager.createQuery("from Modelo ", Modelo.class).getResultList();
+            listaModelo = entityManager.createQuery(" from Modelo ", Modelo.class).getResultList();
         }catch (Exception e)
         {
             System.out.println(e);
@@ -66,39 +68,44 @@ public class ModeloController {
     }
 
     @GET
-    @Path("/get_file")
-    @Produces("application/json")
-    public String getFile() {
+    @Path("/get_data")
+    public byte[] getModeloData(@QueryParam("id")int id) {
 
-        File file= new File("src/Assets/LEGO_Man.zip");
-        if(file.exists())
-        {
-           return "existe";
-        }else
-        {
-            return "pues no";
-        }
+
+        Query query= entityManager.createQuery(" select data from Modelo  where id=:param1");
+        query.setParameter("param1",id);
+
+        byte[] data= (byte[]) query.getSingleResult();
+
+         //byte[] data= (byte[]) entityManager.createQuery(" select data from Modelo  where id=:param1").getSingleResult();
+        //modeloDAO.byteToFile(data,"src/Assets/archivo.zip");
+        return data;
+
     }
 
     @POST
     @Path("/post_modelo")
     @Produces("application/json")
-    public void addModelo()
+    //debo tipar que el post consume este standar que se corresponde con el etiquetado @FormParam
+    //en el header cuando hago el post debe poner tmb este "application/x-www-form-urlencoded"
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    //@Produces(MediaType.TEXT_PLAIN)
+    public void postModeloToDatabase(@FormParam("nombre")String nombre,@FormParam("tipo")String tipo)
     {
-
-        // TODO 1 Hacer una segunda tabla donde solo aparezacan las claves y el byte[] de datos para no sobrecargar la lista de objetos
 
         Modelo modelo= new Modelo();
 
+
         File file= new File("src/Assets/LEGO_Man.zip");
 
-        File fileUnzip = new File("src/Assets/LEGO_Man.zip");
-        File fileFolderUnzip= new File("src/Assets");
+        //File fileUnzip = new File("src/Assets/LEGO_Man.zip");
+        //File fileFolderUnzip= new File("src/Assets");
 
-        modeloDAO.unZipIt(fileUnzip,fileFolderUnzip);
+        //modeloDAO.unZipIt(fileUnzip,fileFolderUnzip);
 
         modelo.setData( modeloDAO.fileToByte(file));
-        modelo.setNombre(file.getName());
+        modelo.setNombre(nombre);
+        modelo.setTipo(tipo);
         entityManager.getTransaction().begin();
 
         //modelo.setNombre(nombre);
@@ -108,13 +115,15 @@ public class ModeloController {
 
     }
 
-    public void connectHibernate()
+    public  void connectHibernate()
     {
 
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("persistenceUnit");
         entityManager = entityManagerFactory.createEntityManager();
 
+
     }
+
 
 }
 
