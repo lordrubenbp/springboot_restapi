@@ -45,7 +45,7 @@ public class ModeloController {
 
     @GET
     @Path("/get_all_modelos")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Modelo> getAllModelos()
     {
 
@@ -66,9 +66,56 @@ public class ModeloController {
         return  listaModelo;
 
     }
+    @GET
+    @Path("/get_all_modelos_animados")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Modelo> getAllModelosAnimados()
+    {
+
+        entityManager.getTransaction().begin();
+        List<Modelo> listaModelo = null;
+        //return modeloRepository.findAll();
+
+        try {
+            listaModelo = entityManager.createQuery(" from Modelo where tipo='animado' ", Modelo.class).getResultList();
+        }catch (Exception e)
+        {
+            System.out.println(e);
+
+        }
+
+        entityManager.getTransaction().commit();
+
+        return  listaModelo;
+
+    }
+    @GET
+    @Path("/get_all_modelos_noanimados")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Modelo> getAllModelosNoAnimados()
+    {
+
+        entityManager.getTransaction().begin();
+        List<Modelo> listaModelo = null;
+        //return modeloRepository.findAll();
+
+        try {
+            listaModelo = entityManager.createQuery(" from Modelo where tipo='noanimado' ", Modelo.class).getResultList();
+        }catch (Exception e)
+        {
+            System.out.println(e);
+
+        }
+
+        entityManager.getTransaction().commit();
+
+        return  listaModelo;
+
+    }
 
     @GET
     @Path("/get_data")
+    //@Produces(MediaType.TEXT_PLAIN)
     public byte[] getModeloData(@QueryParam("id")int id) {
 
 
@@ -85,12 +132,12 @@ public class ModeloController {
 
     @POST
     @Path("/post_modelo")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     //debo tipar que el post consume este standar que se corresponde con el etiquetado @FormParam
     //en el header cuando hago el post debe poner tmb este "application/x-www-form-urlencoded"
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     //@Produces(MediaType.TEXT_PLAIN)
-    public void postModeloToDatabase(@FormParam("nombre")String nombre,@FormParam("tipo")String tipo)
+    public void postModeloToDatabase(@FormParam("nombre")String nombre,@FormParam("tipo")String tipo,@FormParam("extension")String extension)
     {
 
         Modelo modelo= new Modelo();
@@ -106,6 +153,10 @@ public class ModeloController {
         modelo.setData( modeloDAO.fileToByte(file));
         modelo.setNombre(nombre);
         modelo.setTipo(tipo);
+        modelo.setTamaño(file.length()+"");
+
+        modelo.setExtension(extension);
+
         entityManager.getTransaction().begin();
 
         //modelo.setNombre(nombre);
